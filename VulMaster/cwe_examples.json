@@ -1,0 +1,704 @@
+{
+  "CWE-119": [
+    {
+      "id": "10000",
+      "title": "CWE-119 Vulnerable Code Is: CWE-119 void host_lookup ( char * user_supplied_addr ) { struct hostent * hp ; in_addr_t * addr ; <vul-start> char hostname [ 64 ] ; <vul-end> in_addr_t inet_addr ( const char * cp ) ; validate_addr_form ( user_supplied_addr ) ; addr = inet_addr ( user_supplied_addr ) ; hp = gethostbyaddr ( addr , sizeof ( struct in_addr ) , AF_INET ) ; <vul-start> strcpy ( hostname , hp -> h_name ) ; <vul-end> }",
+      "text": "CWE-119 Fixed Code Lines are: <vul-start> char hostname [ 256 <vul-end> ] ; <vul-start> ) ; strncpy <vul-end> ( hostname , <vul-start> hp -> h_name , sizeof ( hostname ) - 1 ) ; hostname [ sizeof ( hostname ) - 1 ] = '\\0' <vul-end> ; }"
+    },
+    {
+      "id": "10001",
+      "title": "CWE-119 Vulnerable Code Is: CWE-119 char * copy_input ( const char * user_supplied_string ) { <vul-start> int i , dst_index ; <vul-end> <vul-start> char * dst_buf = ( char * ) malloc ( 4 * sizeof ( char ) * MAX_SIZE ) ; <vul-end> if ( MAX_SIZE <= strlen ( user_supplied_string ) ) { die ( \"Encoded string too long, aborting!\" ) ; } dst_index = 0 ; <vul-start> for ( int i = 0 ; <vul-end> i < strlen ( user_supplied_string ) ; i ++ ) { if ( '&' == user_supplied_string [ i ] ) { <vul-start> if ( dst_index + 5 > encoded_length ) { <vul-end> die ( \"Encoded string buffer overflow, aborting!\" ) ; } strcpy ( dst_buf + dst_index , \"&amp;\" ) ; dst_index += 5 ; } else if ( '<' == user_supplied_string [ i ] ) { if ( dst_index + 4 > encoded_length ) { die ( \"Encoded string buffer overflow, aborting!\" ) ; } strcpy ( dst_buf + dst_index , \"&lt;\" ) ; dst_index += 4 ; } else { dst_buf [ dst_index ++ ] = user_supplied_string [ i ] ; } } dst_buf [ dst_index ] = '\\0' ; return dst_buf ; }",
+      "text": "CWE-119 Fixed Code Lines are: <vul-start> ) { size_t input_length = strlen ( user_supplied_string ) ; size_t encoded_length = 0 <vul-end> ; char <vul-start> char * dst_buf ; for ( size_t i <vul-end> = 0 ; <vul-start> 0 ; i < input_length <vul-end> ; i <vul-start> ) { encoded_length += 5 ; } else if ( '<' == user_supplied_string [ i ] ) { encoded_length += 4 ; } else { encoded_length += 1 ; } } if ( encoded_length >= ( 4 * MAX_SIZE ) ) { die ( \"Encoded string too long, aborting!\" ) ; } dst_buf = ( char * ) malloc ( ( encoded_length + 1 ) * sizeof ( char ) ) ; size_t dst_index = 0 ; for ( size_t i = 0 ; i < input_length ; i ++ ) { if ( '&' == user_supplied_string [ i ] ) {"
+    },
+    {
+      "id": "10002",
+      "title": "CWE-119 Vulnerable Code Is: CWE-119 int main ( int argc , char * * argv ) { char * items [ ] = { \"boat\" , \"car\" , \"truck\" , \"train\" } ; int num_items = sizeof ( items ) / sizeof ( items [ 0 ] ) ; int index = GetUntrustedOffset ( ) ; <vul-start> printf ( \"You selected %s\\n\" , items [ index - 1 ] ) ; <vul-end> <vul-start> return 0 ; <vul-end> }",
+      "text": "CWE-119 Fixed Code Lines are: <vul-start> ) ; if ( index >= 1 && index <= num_items ) { <vul-start> ) ; } else { printf ( \"Invalid offset specified\\n\" ) ; }"
+    },
+    {
+      "id": "10003",
+      "title": "CWE-119 Vulnerable Code Is: CWE-119 int getValueFromArray ( int * array , int len , int index ) { int value ; <vul-start> if ( index < len ) { <vul-end> value = array [ index ] ; } else { <vul-start> printf ( \"Value is: %d\\n\" , array [ index ] ) ; <vul-end> value = - 1 ; } return value ; }",
+      "text": "CWE-119 Fixed Code Lines are: <vul-start> if ( index >= 0 && index <vul-start> else { if ( index < 0 ) { printf ( \"Invalid array index: Negative value\\n\" ) ; } else { printf ( \"Invalid array index: Out of range\\n\" ) ; } <vul-end> value ="
+    }
+  ],
+  "CWE-125": [
+    {
+      "id": "10004",
+      "title": "CWE-125 Vulnerable Code Is: CWE-125 int getValueFromArray ( int * array , int len , int index ) { int value ; <vul-start> if ( index < len ) { <vul-end> value = array [ index ] ; } else { <vul-start> printf ( \"Value is: %d\\n\" , array [ index ] ) ; <vul-end> value = - 1 ; } return value ; }",
+      "text": "CWE-125 Fixed Code Lines are: <vul-start> if ( index >= 0 && index <vul-start> else { if ( index < 0 ) { printf ( \"Invalid array index: Negative value\\n\" ) ; } else { printf ( \"Invalid array index: Out of range\\n\" ) ; } <vul-end> value ="
+    }
+  ],
+  "CWE-787": [
+    {
+      "id": "10006",
+      "title": "CWE-787 Vulnerable Code Is: CWE-787 int returnChunkSize ( void * ) { .. . } int main ( ) { <vul-start> .. . memcpy ( destBuf , srcBuf , ( returnChunkSize ( destBuf ) - 1 ) ) ; <vul-end> .. . }",
+      "text": "CWE-787 Fixed Code Lines are: <vul-start> .. . int size = returnChunkSize ( destBuf ) ; if ( size >= 1 ) { <vul-start> , srcBuf , size <vul-end> - 1 ) <vul-start> - 1 ) ; } <vul-end> .. ."
+    },
+    {
+      "id": "10007",
+      "title": "CWE-787 Vulnerable Code Is: CWE-787 void host_lookup ( char * user_supplied_addr ) { struct hostent * hp ; in_addr_t * addr ; char hostname [ 256 ] ; in_addr_t inet_addr ( const char * cp ) ; validate_addr_form ( user_supplied_addr ) ; addr = inet_addr ( user_supplied_addr ) ; hp = gethostbyaddr ( addr , sizeof ( struct in_addr ) , AF_INET ) ; <vul-start> strcpy ( hostname , hp -> h_name ) ; <vul-end> }",
+      "text": "CWE-787 Fixed Code Lines are: <vul-start> ) ; strncpy <vul-end> ( hostname , <vul-start> hp -> h_name , sizeof ( hostname ) - 1 ) ; hostname [ sizeof ( hostname ) - 1 ] = '\\0' <vul-end> ; }"
+    },
+    {
+      "id": "10008",
+      "title": "CWE-787 Vulnerable Code Is: CWE-787 char * copy_input ( char * user_supplied_string ) { int i , dst_index ; <vul-start> char * dst_buf = ( char * ) malloc ( 4 * sizeof ( char ) * MAX_SIZE ) ; <vul-end> if ( MAX_SIZE <= strlen ( user_supplied_string ) ) { die ( \"user string too long, die evil hacker!\" ) ; } dst_index = 0 ; for ( i = 0 ; i < strlen ( user_supplied_string ) ; i ++ ) { if ( '&' == user_supplied_string [ i ] ) { <vul-start> dst_buf [ dst_index ++ ] = '&' ; <vul-end> dst_buf [ dst_index ++ ] = 'a' ; dst_buf [ dst_index ++ ] = 'm' ; dst_buf [ dst_index ++ ] = 'p' ; dst_buf [ dst_index ++ ] = ';' ; } else if ( '<' == user_supplied_string [ i ] ) { <vul-start> dst_buf [ dst_index ++ ] = '&' ; <vul-end> dst_buf [ dst_index ++ ] = 'l' ; dst_buf [ dst_index ++ ] = 't' ; dst_buf [ dst_index ++ ] = ';' ; } else { <vul-start> dst_buf [ dst_index ++ ] = user_supplied_string [ i ] ; <vul-end> } } return dst_buf ; }",
+      "text": "CWE-787 Fixed Code Lines are: <vul-start> ) malloc ( ( 5 * strlen ( user_supplied_string ) + 1 ) <vul-end> * sizeof ( <vul-start> ( char ) <vul-end> ) ; <vul-start> ) { if ( dst_index + 5 >= ( 5 * strlen ( user_supplied_string ) + 1 ) ) { die ( \"destination buffer too small, abort encoding!\" ) ; } <vul-start> ) { if ( dst_index + 4 >= ( 5 * strlen ( user_supplied_string ) + 1 ) ) { die ( \"destination buffer too small, abort encoding!\" ) ; } <vul-start> else { if ( dst_index + 1 >= ( 5 * strlen ( user_supplied_string ) + 1 ) ) { die ( \"destination buffer too small, abort encoding!\" ) ; } dst_buf [ dst_index ++ ] = user_supplied_string [ i ] ; } } dst_buf [ dst_index ] = '\\0' ; <vul-end> return dst_buf"
+    },
+    {
+      "id": "10009",
+      "title": "CWE-787 Vulnerable Code Is: CWE-787 char * trimTrailingWhitespace ( char * strMessage , int length ) { <vul-start> char * retMessage ; <vul-end> <vul-start> char * message = malloc ( sizeof ( char ) * ( length + 1 ) ) ; <vul-end> char message [ length + 1 ] ; int index ; for ( index = 0 ; index < length ; index ++ ) { message [ index ] = strMessage [ index ] ; } message [ index ] = '\\0' ; int len = index - 1 ; while ( len >= 0 && isspace ( message [ len ] ) ) { message [ len ] = '\\0' ; len -- ; } retMessage = malloc ( sizeof ( char ) * ( len + 2 ) ) ; strncpy ( retMessage , message , len + 1 ) ; retMessage [ len + 1 ] = '\\0' ; return retMessage ; }",
+      "text": "CWE-787 Fixed Code Lines are: <vul-start> char * retMessage <vul-end> = malloc ( <vul-start> 1 ) ) <vul-end> ; int"
+    },
+    {
+      "id": "10010",
+      "title": "CWE-787 Vulnerable Code Is: CWE-787 int main ( ) { <vul-start> .. . strncpy ( destBuf , & srcBuf [ find ( srcBuf , ch ) ] , 1024 ) ; <vul-end> <vul-start> .. . } <vul-end>",
+      "text": "CWE-787 Fixed Code Lines are: <vul-start> .. . size_t index = find ( srcBuf , ch ) ; if ( index >= 0 && index < strlen ( srcBuf ) ) { <vul-start> & srcBuf [ index <vul-end> ] , 1024 <vul-start> ) ; } else { strncpy ( destBuf , DEFAULT_VALUE , 1024 ) ; }"
+    }
+  ],
+  "CWE-120": [
+    {
+      "id": "10027",
+      "title": "CWE-120 Vulnerable Code Is: CWE-120 <vul-start> // char last_name [ 20 ] ; <vul-end> printf ( \" Enter your last name : \" ) ; <vul-start> scanf ( \" % s \" , last_name ) ; <vul-end>",
+      "text": "CWE-120 Fixed Code Lines are: <vul-start> // char last_name [ 256 <vul-end> ] ; <vul-start> ( \" % 255"
+    },
+    {
+      "id": "10028",
+      "title": "CWE-120 Vulnerable Code Is: CWE-120 void manipulate_string ( char * string ) { <vul-start> char buf [ 24 ] ; <vul-end> <vul-start> strcpy ( buf , string ) ; <vul-end> .. . }",
+      "text": "CWE-120 Fixed Code Lines are: <vul-start> char buf [ 256 <vul-end> ] ; <vul-start> ] ; strncpy <vul-end> ( buf , <vul-start> buf , string , sizeof ( buf ) - 1"
+    },
+    {
+      "id": "10029",
+      "title": "CWE-120 Vulnerable Code Is: CWE-120 char buf [ 24 ] ; printf ( \" Please enter your name and press < Enter > \\n \" ) ; <vul-start> gets ( buf ) ; <vul-end> .. . }",
+      "text": "CWE-120 Fixed Code Lines are: <vul-start> ) ; fgets ( buf , sizeof ( buf ) , stdin <vul-end> ) ;"
+    },
+    {
+      "id": "10030",
+      "title": "CWE-120 Vulnerable Code Is: CWE-120 .. . struct hostent * clienthp ; char hostname [ MAX_LEN ] ; .. . int count = 0 ; for ( count = 0 ; count < MAX_CONNECTIONS ; count ++ ) { int clientlen = sizeof ( struct sockaddr_in ) ; int clientsocket = accept ( serversocket , ( struct sockaddr * ) & clientaddr , & clientlen ) ; if ( clientsocket >= 0 ) { clienthp = gethostbyaddr ( ( char * ) & clientaddr . sin_addr . s_addr , sizeof ( clientaddr . sin_addr . s_addr ) , AF_INET ) ; <vul-start> .. . close ( clientsocket ) ; <vul-end> } } close ( serversocket ) ;",
+      "text": "CWE-120 Fixed Code Lines are: <vul-start> ) ; if ( strlen ( clienthp -> h_name ) >= MAX_LEN ) { logOutput ( \"Hostname exceeds maximum length\" ) ; } else { strncpy ( hostname , clienthp -> h_name , MAX_LEN - 1 ) ; hostname [ MAX_LEN - 1 ] = '\\0' ; logOutput ( \"Accepted client connection from host \" , hostname ) ; }"
+    }
+  ],
+  "CWE-190": [
+    {
+      "id": "10012",
+      "title": "CWE-190 Vulnerable Code Is: CWE-190 img_t table_ptr ; int num_imgs ; <vul-start> .. . num_imgs = get_num_imgs ( ) ; <vul-end> table_ptr = ( img_t * ) malloc ( sizeof ( img_t ) * num_imgs ) ;",
+      "text": "CWE-190 Fixed Code Lines are: <vul-start> ( ) ; if ( num_imgs < = 0 || SIZE_MAX / sizeof ( img_t ) < num_imgs ) { ExitError ( \"Invalid number of images requested!\" ) ; }"
+    },
+    {
+      "id": "10013",
+      "title": "CWE-190 Vulnerable Code Is: CWE-190 nresp = packet_get_int ( ) ; <vul-start> if ( nresp > 0 ) { <vul-end> response = xmalloc ( nresp * sizeof ( char * ) ) ; for ( i = 0 ; i < nresp ; i ++ ) response [ i ] = packet_get_string ( NULL ) ; }",
+      "text": "CWE-190 Fixed Code Lines are: <vul-start> 0 ) { if ( nresp > SIZE_MAX / sizeof ( char * ) ) { ExitError ( \"Integer overflow occurred!\" ) ; }"
+    },
+    {
+      "id": "10014",
+      "title": "CWE-190 Vulnerable Code Is: CWE-190 short int bytesRec = 0 ; char buf [ SOMEBIGNUM ] ; while ( bytesRec < MAXGET ) { <vul-start> bytesRec += getFromInput ( buf + bytesRec ) ; <vul-end> }",
+      "text": "CWE-190 Fixed Code Lines are: <vul-start> ) { if ( bytesRec > MAXGET - getFromInput ( buf + bytesRec ) ) { ExitError ( \"Integer overflow occurred!\" ) ; }"
+    },
+    {
+      "id": "10015",
+      "title": "CWE-190 Vulnerable Code Is: CWE-190 <vul-start> // #define JAN 1 #define FEB 2 #define MAR 3 short getMonthlySales ( int month ) { <vul-end> .. . } <vul-start> float calculateRevenueForQuarter ( short quarterSold ) { <vul-end> .. . } int determineFirstQuarterRevenue ( ) { float quarterRevenue = 0.0f ; <vul-start> short JanSold = getMonthlySales ( JAN ) ; <vul-end> <vul-start> short FebSold = getMonthlySales ( FEB ) ; <vul-end> <vul-start> short MarSold = getMonthlySales ( MAR ) ; <vul-end> <vul-start> short quarterSold = JanSold + FebSold + MarSold ; <vul-end> quarterRevenue = calculateRevenueForQuarter ( quarterSold ) ; saveFirstQuarterRevenue ( quarterRevenue ) ; return 0 ; }",
+      "text": "CWE-190 Fixed Code Lines are: <vul-start> #define MAR 3 int <vul-end> getMonthlySales ( int <vul-start> float calculateRevenueForQuarter ( int <vul-end> quarterSold ) { <vul-start> 0.0f ; int <vul-end> JanSold = getMonthlySales <vul-start> ) ; int <vul-end> FebSold = getMonthlySales <vul-start> ) ; int <vul-end> MarSold = getMonthlySales <vul-start> ) ; int <vul-end> quarterSold = JanSold"
+    }
+  ],
+  "CWE-682": [
+    {
+      "id": "10089",
+      "title": "CWE-682 Vulnerable Code Is: CWE-682 img_t table_ptr ; int num_imgs ; .. . num_imgs = get_num_imgs ( ) ; <vul-start> table_ptr = ( img_t * ) malloc ( sizeof ( img_t ) * num_imgs ) ; <vul-end>",
+      "text": "CWE-682 Fixed Code Lines are: <vul-start> ) ; if ( num_imgs < = 0 ) { num_imgs = 0 ; } if ( num_imgs > 0 ) { <vul-start> ) ; } else { table_ptr = NULL ; }"
+    },
+    {
+      "id": "10090",
+      "title": "CWE-682 Vulnerable Code Is: CWE-682 int * p = x ; <vul-start> char * second_char = ( char * ) ( p + 1 ) ; <vul-end>",
+      "text": "CWE-682 Fixed Code Lines are: <vul-start> * ) ( ( char * )"
+    }
+  ],
+  "CWE-369": [
+    {
+      "id": "10042",
+      "title": "CWE-369 Vulnerable Code Is: CWE-369 double divide ( double x , double y ) { <vul-start> return x / y ; <vul-end> }",
+      "text": "CWE-369 Fixed Code Lines are: <vul-start> ) { if ( 0 == y ) { throw DivideByZero ; }"
+    },
+    {
+      "id": "10043",
+      "title": "CWE-369 Vulnerable Code Is: CWE-369 <vul-start> // int SafeDivision ( int x , int y ) { <vul-end> return ( x / y ) ; <vul-start> } <vul-end>",
+      "text": "CWE-369 Fixed Code Lines are: <vul-start> int y ) { try <vul-start> } catch ( System . DivideByZeroException dbz ) { System . Console . WriteLine ( \"Division by zero attempted!\" ) ; return 0 ; } }"
+    }
+  ],
+  "CWE-191": [
+    {
+      "id": "10079",
+      "title": "CWE-191 Vulnerable Code Is: CWE-191 #include #include int main ( void ) { <vul-start> int i ; <vul-end> <vul-start> i = - 2147483648 ; <vul-end> i = i - 1 ; return 0 ; }",
+      "text": "CWE-191 Fixed Code Lines are: <vul-start> ) { unsigned <vul-start> i = 0x80000000 <vul-end> ; i"
+    },
+    {
+      "id": "10080",
+      "title": "CWE-191 Vulnerable Code Is: CWE-191 #include #include int main ( void ) { int a = 5 , b = 6 ; <vul-start> size_t len = a - b ; <vul-end> char buf [ len ] ; <vul-start> return 0 ; <vul-end> }",
+      "text": "CWE-191 Fixed Code Lines are: <vul-start> size_t len = ( a >= b ) ? ( <vul-start> a - b ) : 0 ; if ( len > 0 ) { <vul-end> char buf <vul-start> ] ; } else { }"
+    }
+  ],
+  "CWE-193": [
+    {
+      "id": "10100",
+      "title": "CWE-193 Vulnerable Code Is: CWE-193 int i ; unsigned int numWidgets ; Widget * * WidgetList ; numWidgets = GetUntrustedSizeValue ( ) ; if ( ( numWidgets == 0 ) || ( numWidgets > MAX_NUM_WIDGETS ) ) { ExitError ( \"Incorrect number of widgets requested!\" ) ; } <vul-start> printf ( \" WidgetList ptr = % p \\n \" for ( i = 0 ; <vul-end> i < numWidgets ; i ++ ) { WidgetList [ i ] = InitializeWidget ( ) ; } <vul-start> showWidgets ( WidgetList ) ; <vul-end>",
+      "text": "CWE-193 Fixed Code Lines are: <vul-start> } WidgetList = ( Widget * * ) malloc ( ( numWidgets + 1 ) * sizeof ( Widget * ) ) ; <vul-start> } WidgetList [ numWidgets ] = NULL ; <vul-start> ( WidgetList ) <vul-end> ;"
+    },
+    {
+      "id": "10101",
+      "title": "CWE-193 Vulnerable Code Is: CWE-193 char firstname [ 20 ] ; char lastname [ 20 ] ; char fullname [ 40 ] ; fullname [ 0 ] = '\\0' ; <vul-start> strncat ( fullname , firstname , 20 ) ; <vul-end> <vul-start> strncat ( fullname , lastname , 20 ) ; <vul-end>",
+      "text": "CWE-193 Fixed Code Lines are: <vul-start> , firstname , sizeof ( fullname ) - strlen ( fullname ) - 1 <vul-end> ) ; <vul-start> , lastname , sizeof ( fullname ) - strlen ( fullname ) - 1 <vul-end> ) ;"
+    },
+    {
+      "id": "10102",
+      "title": "CWE-193 Vulnerable Code Is: CWE-193 for ( i = 0 ; <vul-start> i < = PATH_SIZE ; <vul-end> i ++ ) { char c = getc ( ) ; if ( c = = EOF ) { filename [ i ] = '\\0' ; break ; } filename [ i ] = c ; }",
+      "text": "CWE-193 Fixed Code Lines are: <vul-start> i < <vul-end> PATH_SIZE ;"
+    },
+    {
+      "id": "10103",
+      "title": "CWE-193 Vulnerable Code Is: CWE-193 int setFilename ( char * filename ) { char name [ 21 ] ; <vul-start> sprintf ( name , \"%16s.dat\" , filename ) ; <vul-end> int success = saveFormattedFilenameToDB ( name ) ; return success ; }",
+      "text": "CWE-193 Fixed Code Lines are: <vul-start> ] ; snprintf ( name , sizeof ( name ) <vul-end> , \"%16s.dat\" ,"
+    }
+  ],
+  "CWE-285": [
+    {
+      "id": "10047",
+      "title": "CWE-285 Vulnerable Code Is: CWE-285 <vul-start> // function runEmployeeQuery ( $ dbName , $ name ) { <vul-end> mysql_select_db ( $ dbName , $ globalDbHandle ) or die ( \"Could not open Database\" . $ dbName ) ; $ preparedStatement = $ globalDbHandle -> prepare ( ' ELECT * FROM employees WHERE name = : name ' ; $ preparedStatement -> execute ( array ( ' name ' => $ name ) ) ; return $ preparedStatement -> fetchAll ( ) ; } / .. . / $ employeeRecord = runEmployeeQuery ( ' mployeeDB ' $ _GET [ ' mployeeName ' ) ;",
+      "text": "CWE-285 Fixed Code Lines are: <vul-start> name ) { if ( ! isAuthorized ( $ name ) ) { die ( \"Unauthorized access\" ) ; }"
+    }
+  ],
+  "CWE-732": [
+    {
+      "id": "10063",
+      "title": "CWE-732 Vulnerable Code Is: CWE-732 <vul-start> // #define OUTFILE \"hello.out\" umask ( 0 ) ; <vul-end> FILE * out ; out = fopen ( OUTFILE , \" w \" ) ; if ( out ) { fprintf ( out , \" hello world ! \\n \" ) ; fclose ( out ) ; }",
+      "text": "CWE-732 Fixed Code Lines are: <vul-start> \"hello.out\" umask ( S_IRUSR | S_IWUSR <vul-end> ) ;"
+    }
+  ],
+  "CWE-863": [
+    {
+      "id": "10074",
+      "title": "CWE-863 Vulnerable Code Is: CWE-863 $ role = $ _COOKIES [ ' ole ' ; if ( ! $ role ) { <vul-start> $ role = getRole ( ' ser ' ; <vul-end> if ( $ role ) { setcookie ( \"role\" , $ role , time ( ) + 60 * 60 * 2 ) ; } else { ShowLoginScreen ( ) ; <vul-start> die ( \"\\n\" ) ; <vul-end> } } if ( $ role = = ' eader ' { DisplayMedicalHistory ( $ _POST [ ' atient_ID ' ) ; } else { die ( \"You are not Authorized to view this record\\n\" ) ; }",
+      "text": "CWE-863 Fixed Code Lines are: <vul-start> ) { <vul-end> ShowLoginScreen ( ) <vul-start> \"\\n\" ) ; <vul-end> }"
+    }
+  ],
+  "CWE-862": [
+    {
+      "id": "10085",
+      "title": "CWE-862 Vulnerable Code Is: CWE-862 <vul-start> // function runEmployeeQuery ( $ dbName , $ name ) { <vul-end> mysql_select_db ( $ dbName , $ globalDbHandle ) or die ( \"Could not open Database\" . $ dbName ) ; $ preparedStatement = $ globalDbHandle -> prepare ( ' ELECT * FROM employees WHERE name = : name ' ; $ preparedStatement -> execute ( array ( ' name ' => $ name ) ) ; return $ preparedStatement -> fetchAll ( ) ; }",
+      "text": "CWE-862 Fixed Code Lines are: <vul-start> name ) { if ( ! isAuthorized ( ) ) { die ( \"Unauthorized access\" ) ; }"
+    }
+  ],
+  "CWE-269": [
+    {
+      "id": "10026",
+      "title": "CWE-269 Vulnerable Code Is: CWE-269 seteuid ( 0 ) ; <vul-start> seteuid ( getuid ( ) ) ; <vul-end>",
+      "text": "CWE-269 Fixed Code Lines are: <vul-start> seteuid ( geteuid <vul-end> ( ) )"
+    }
+  ],
+  "CWE-287": [
+    {
+      "id": "10053",
+      "title": "CWE-287 Vulnerable Code Is: CWE-287 my $ q = new CGI ; if ( $ q -> cookie ( ' loggedin ' ) ne \" true \" ) { <vul-start> if ( ! AuthenticateUser ( $ q -> param ( ' username ' ) , $ q -> param ( ' password ' ) ) ) { <vul-end> <vul-start> ExitError ( \"Error: invalid username or password\" ) ; <vul-end> } else { <vul-start> # Set loggedin and user cookies . $ q -> cookie ( - name => ' loggedin ' , - value => ' rue ' ) ; <vul-end> <vul-start> $ q -> cookie ( - name => ' ser ' - value => $ q -> param ( ' sername ' ) ; <vul-end> } } <vul-start> if ( $ q -> cookie ( ' ser ' eq \"Administrator\" && $ q -> cookie ( ' oggedin ' eq \"true\" ) { <vul-end> DoAdministratorTasks ( ) ; }",
+      "text": "CWE-287 Fixed Code Lines are: <vul-start> if ( ! $ q -> cookie ( ' loggedin ' ) || ! $ q -> cookie ( ' user ' ) ) { ExitError ( \" Error : you need to log in first \" ) ; } elsif ( ! <vul-start> ExitError ( \" Error : invalid username or password \" <vul-end> ) ; <vul-start> # Set loggedin and <vul-end> user cookies . <vul-start> value => ' true <vul-end> ' ) ; <vul-start> name => ' user ' , <vul-end> - value => <vul-start> param ( ' username ' ) <vul-end> ) ; <vul-start> cookie ( ' user ' ) eq \" Administrator \" <vul-end> && $ q <vul-start> cookie ( ' loggedin ' ) eq \" true \" <vul-end> ) {"
+    }
+  ],
+  "CWE-346": [
+    {
+      "id": "10097",
+      "title": "CWE-346 Vulnerable Code Is: CWE-346 IntentFilter filter = new IntentFilter ( \"com.example.RemoveUser\" ) ; <vul-start> MyReceiver receiver = new MyReceiver ( ) ; <vul-end> registerReceiver ( receiver , filter ) ; public class DeleteReceiver extends BroadcastReceiver { @Override public void onReceive ( Context context , Intent intent ) { int userID = intent . getIntExtra ( \"userID\" , - 1 ) ; <vul-start> } <vul-end> <vul-start> + } <vul-end>",
+      "text": "CWE-346 Fixed Code Lines are: <vul-start> new MyReceiver ( ) ; filter . setPriority ( IntentFilter . SYSTEM_HIGH_PRIORITY ) ; filter . addCategory ( Intent . CATEGORY_DEFAULT <vul-start> ) ; if ( isTrustedSource ( intent ) ) { destroyUserData ( userID ) ; } else { } <vul-start> } + private boolean isTrustedSource ( Intent intent ) { }"
+    }
+  ],
+  "CWE-200": [
+    {
+      "id": "10011",
+      "title": "CWE-200 Vulnerable Code Is: CWE-200 try { openDbConnection ( ) ; } catch ( Exception $ e ) { <vul-start> echo ' Caught exception : ' , $ e -> getMessage ( ) , ' \\n ' ; <vul-end> echo ' Check credentials in config file at : ' , $ Mysql_config_location , ' \\n ' ; }",
+      "text": "CWE-200 Fixed Code Lines are: <vul-start> Caught exception : An error occurred while connecting to the database . ' <vul-end> , ' \\n"
+    }
+  ],
+  "CWE-203": [
+    {
+      "id": "10111",
+      "title": "CWE-203 Vulnerable Code Is: CWE-203 my $ username = param ( ' sername ' ; my $ password = param ( ' assword ' ; if ( IsValidUsername ( $ username ) == 1 ) { if ( IsValidPassword ( $ username , $ password ) == 1 ) { print \"Login Successful\" ; } else { <vul-start> print \"Login Failed - incorrect password\" ; <vul-end> } } else { <vul-start> print \" Login Failed - unknown username \" ; <vul-end> }",
+      "text": "CWE-203 Fixed Code Lines are: <vul-start> { print \"Login Failed - incorrect username or password\" <vul-end> ; } <vul-start> Login Failed - incorrect username or password <vul-end> \" ;"
+    }
+  ],
+  "CWE-22": [
+    {
+      "id": "10044",
+      "title": "CWE-22 Vulnerable Code Is: CWE-22 tring path = getInputPath ( ) ; if ( isPathValid ( path ) ) { File f = new File ( path ) ; f . delete ( ) ; } boolean isPathValid ( String path ) { <vul-start> } <vul-end>",
+      "text": "CWE-22 Fixed Code Lines are: <vul-start> ) { File canonicalFile ; try { canonicalFile = new File ( \"/safe_dir\" ) . getCanonicalFile ( ) ; } catch ( IOException e ) { return false ; } File inputFile ; try { inputFile = new File ( path ) . getCanonicalFile ( ) ; } catch ( IOException e ) { return false ; } return inputFile . toPath ( ) . startsWith ( canonicalFile . toPath ( ) ) ;"
+    }
+  ],
+  "CWE-134": [
+    {
+      "id": "10049",
+      "title": "CWE-134 Vulnerable Code Is: CWE-134 #include void printWrapper ( const char * string ) { printf ( string ) ; } int main ( int argc , char * * argv ) { <vul-start> char buf [ 5012 ] ; <vul-end> memcpy ( buf , argv [ 1 ] , 5012 ) ; printWrapper ( argv [ 1 ] ) ; <vul-start> return 0 ; <vul-end> }",
+      "text": "CWE-134 Fixed Code Lines are: <vul-start> ) { if ( argc >= 2 ) { <vul-end> printWrapper ( <vul-start> ) ; }"
+    },
+    {
+      "id": "10050",
+      "title": "CWE-134 Vulnerable Code Is: CWE-134 int main ( int argc , char * * argv ) { <vul-start> char buf [ 128 ] ; <vul-end> <vul-start> snprintf ( buf , 128 , argv [ 1 ] ) ; <vul-end> return 0 ; }",
+      "text": "CWE-134 Fixed Code Lines are: <vul-start> ) { if ( argc >= 2 ) { <vul-start> ] ; strncpy ( buf <vul-end> , argv [ <vul-start> [ 1 ] , sizeof ( buf ) - 1 ) ; buf [ sizeof ( buf ) - 1 ] = '\\0' ; } <vul-end> return 0"
+    }
+  ],
+  "CWE-522": [
+    {
+      "id": "10072",
+      "title": "CWE-522 Vulnerable Code Is: CWE-522 .. . Properties prop = new Properties ( ) ; prop . load ( new FileInputStream ( \" config . properties \" ) ) ; <vul-start> String password = prop . getProperty ( \"password\" ) ; <vul-end> DriverManager . getConnection ( url , usr , password ) ;",
+      "text": "CWE-522 Fixed Code Lines are: <vul-start> String password = getPasswordFromSecureSource ( <vul-end> ) ;"
+    },
+    {
+      "id": "10073",
+      "title": "CWE-522 Vulnerable Code Is: CWE-522 <vul-start> // .. . NetworkCredential netCred = new NetworkCredential ( username , password , domain ) ; <vul-end>",
+      "text": "CWE-522 Fixed Code Lines are: <vul-start> // .. . String password = getPasswordFromSecureSource ( ) ;"
+    }
+  ],
+  "CWE-74": [
+    {
+      "id": "10048",
+      "title": "CWE-74 Vulnerable Code Is: CWE-74 <vul-start> // $ userName = $ _POST [ \"user\" ] ; <vul-end> <vul-start> $ command = ' ls - l / home / ' . $ userName ; <vul-end> system ( $ command ) ;",
+      "text": "CWE-74 Fixed Code Lines are: <vul-start> [ \"user\" ] ; $ escapedUserName = escapeshellarg ( $ userName ) <vul-start> ' . $ escapedUserName <vul-end> ; system"
+    }
+  ],
+  "CWE-400": [
+    {
+      "id": "10019",
+      "title": "CWE-400 Vulnerable Code Is: CWE-400 <vul-start> // sock = socket ( AF_INET , SOCK_STREAM , 0 ) ; <vul-end> while ( 1 ) { newsock = accept ( sock , .. . ) ; printf ( \"A connection has been accepted\\n\" ) ; pid = fork ( ) ; <vul-start> } <vul-end>",
+      "text": "CWE-400 Fixed Code Lines are: <vul-start> , 0 ) ; int connectionCount = 0 <vul-start> ) ; if ( pid == 0 ) { close ( sock ) ; handleConnection ( newsock ) ; close ( newsock ) ; exit ( 0 ) ; } else if ( pid > 0 ) { close ( newsock ) ; connectionCount ++ ; if ( connectionCount >= MAX_CONNECTIONS ) { printf ( \"Maximum number of connections reached. Exiting.\\n\" ) ; break ; } } else { printf ( \"Fork failed. Exiting.\\n\" ) ; break ; }"
+    },
+    {
+      "id": "10020",
+      "title": "CWE-400 Vulnerable Code Is: CWE-400 int writeDataFromSocketToFile ( char * host , int port ) { <vul-start> char filename [ FILENAME_SIZE ] ; <vul-end> char buffer [ BUFFER_SIZE ] ; int socket = openSocketConnection ( host , port ) ; if ( socket < 0 ) { printf ( \"Unable to open socket connection\" ) ; return ( FAIL ) ; } if ( getNextMessage ( socket , filename , FILENAME_SIZE ) > 0 ) { <vul-start> if ( openFileToWrite ( filename ) > 0 ) { <vul-end> int bytesRead ; int totalBytesWritten = 0 ; while ( ( bytesRead = getNextMessage ( socket , buffer , BUFFER_SIZE ) ) > 0 ) { if ( ! ( writeToFile ( buffer , bytesRead ) > 0 ) ) break ; totalBytesWritten += bytesRead ; <vul-start> } <vul-end> closeFile ( ) ; } } closeSocket ( socket ) ; }",
+      "text": "CWE-400 Fixed Code Lines are: <vul-start> filename [ FILENAME_SIZE + 1 <vul-start> if ( validateFilename ( filename ) > 0 && <vul-start> bytesRead ; if ( totalBytesWritten >= MAX_FILE_SIZE ) { printf ( \"File size limit exceeded. Aborting.\\n\" ) ; break ; }"
+    },
+    {
+      "id": "10021",
+      "title": "CWE-400 Vulnerable Code Is: CWE-400 int processMessage ( char * * message ) { <vul-start> char * body ; <vul-end> int length = getMessageLength ( message [ 0 ] ) ; <vul-start> if ( length > 0 ) { <vul-end> body = & message [ 1 ] [ 0 ] ; processMessageBody ( body ) ; return SUCCESS ; } else { printf ( \"Unable to process message; invalid message length\" ) ; return FAIL ; } }",
+      "text": "CWE-400 Fixed Code Lines are: <vul-start> char * body = NULL ; unsigned <vul-end> int length = <vul-start> length > 0 && length < MAX_LENGTH"
+    }
+  ],
+  "CWE-770": [
+    {
+      "id": "10075",
+      "title": "CWE-770 Vulnerable Code Is: CWE-770 <vul-start> // sock = socket ( AF_INET , SOCK_STREAM , 0 ) ; <vul-end> while ( 1 ) { newsock = accept ( sock , .. . ) ; printf ( \"A connection has been accepted\\n\" ) ; <vul-start> pid = fork ( ) ; <vul-end> <vul-start> } <vul-end>",
+      "text": "CWE-770 Fixed Code Lines are: <vul-start> , 0 ) ; int connectionCount = 0 <vul-start> ) ; if ( connectionCount >= MAX_CONNECTIONS ) { printf ( \"Connection limit exceeded. Please try again later.\\n\" ) ; close ( newsock ) ; continue ; } <vul-start> ) ; if ( pid == 0 ) { close ( sock ) ; handleConnection ( newsock ) ; exit ( 0 ) ; } else if ( pid > 0 ) { close ( newsock ) ; connectionCount ++ ; } else { printf ( \"Fork failed. Please try again later.\\n\" ) ; close ( newsock ) ; }"
+    },
+    {
+      "id": "10076",
+      "title": "CWE-770 Vulnerable Code Is: CWE-770 <vul-start> // int writeDataFromSocketToFile ( char * host , int port ) { <vul-end> char filename [ FILENAME_SIZE ] ; char buffer [ BUFFER_SIZE ] ; int socket = openSocketConnection ( host , port ) ;",
+      "text": "CWE-770 Fixed Code Lines are: <vul-start> port ) { const int MAX_FILE_SIZE = 1048576 ;"
+    },
+    {
+      "id": "10077",
+      "title": "CWE-770 Vulnerable Code Is: CWE-770 int processMessage ( char * * message ) { <vul-start> int length = getMessageLength ( message [ 0 ] ) ; <vul-end> <vul-start> if ( length > 0 ) { <vul-end> char * body = & message [ 1 ] [ 0 ] ; processMessageBody ( body ) ; return ( SUCCESS ) ; } else { printf ( \"Unable to process message; invalid message length\" ) ; return ( FAIL ) ; }",
+      "text": "CWE-770 Fixed Code Lines are: <vul-start> ) { const unsigned int MAX_LENGTH = 10000 ; unsigned <vul-start> length > 0 && length < MAX_LENGTH"
+    },
+    {
+      "id": "10078",
+      "title": "CWE-770 Vulnerable Code Is: CWE-770 bar connection ( ) { <vul-start> foo = malloc ( 1024 ) ; <vul-end> return foo ; } endConnection ( bar foo ) { free ( foo ) ; } int main ( ) { while ( 1 ) { foo = connection ( ) ; } endConnection ( foo ) }",
+      "text": "CWE-770 Fixed Code Lines are: <vul-start> = malloc ( sizeof ( * foo ) <vul-end> ) ;"
+    }
+  ],
+  "CWE-404": [
+    {
+      "id": "10038",
+      "title": "CWE-404 Vulnerable Code Is: CWE-404 int decodeFile ( char * fName ) { char buf [ BUF_SZ ] ; FILE * f = fopen ( fName , \"r\" ) ; if ( ! f ) { printf ( \"cannot open %s\\n\" , fName ) ; return DECODE_FAIL ; } else { while ( fgets ( buf , BUF_SZ , f ) ) { if ( ! checkChecksum ( buf ) ) { <vul-start> return DECODE_FAIL ; <vul-end> } else { decodeBlock ( buf ) ; } } <vul-start> } <vul-end> return DECODE_SUCCESS ; }",
+      "text": "CWE-404 Fixed Code Lines are: <vul-start> ) { fclose ( f ) ; <vul-start> } fclose ( f ) ;"
+    },
+    {
+      "id": "10039",
+      "title": "CWE-404 Vulnerable Code Is: CWE-404 class A { void foo ( ) ; } ; void A :: foo ( ) { <vul-start> int * ptr ; <vul-end> ptr = ( int * ) malloc ( sizeof ( int ) ) ; delete ptr ; }",
+      "text": "CWE-404 Fixed Code Lines are: <vul-start> int * ptr = new int <vul-end> ; delete"
+    },
+    {
+      "id": "10040",
+      "title": "CWE-404 Vulnerable Code Is: CWE-404 class A { void foo ( bool ) ; } ; void A :: foo ( bool heap ) { <vul-start> int localArray [ 2 ] = { <vul-end> 11 , 22 } ; int * p = localArray ; if ( heap ) { p = new int [ 2 ] ; } else { p = nullptr ; } <vul-start> } <vul-end>",
+      "text": "CWE-404 Fixed Code Lines are: <vul-start> { int * p <vul-end> ; if <vul-start> } if ( heap ) { delete [ ] p ; } else { delete p ; }"
+    }
+  ],
+  "CWE-772": [
+    {
+      "id": "10023",
+      "title": "CWE-772 Vulnerable Code Is: CWE-772 qlConnection conn = new SqlConnection ( connString ) ; SqlCommand cmd = new SqlCommand ( queryString ) ; cmd . Connection = conn ; conn . Open ( ) ; SqlDataReader rdr = null ; try { <vul-start> rdr = cmd . ExecuteReader ( ) ; <vul-end> <vul-start> HarvestResults ( rdr ) ; <vul-end> } catch ( Exception ex ) { } finally { <vul-start> conn . Close ( ) ; <vul-end> }",
+      "text": "CWE-772 Fixed Code Lines are: <vul-start> try { using ( <vul-start> ExecuteReader ( ) ) { <vul-end> HarvestResults ( <vul-start> rdr ) ; } <vul-start> finally { rdr ? . Close ( ) ;"
+    },
+    {
+      "id": "10024",
+      "title": "CWE-772 Vulnerable Code Is: CWE-772 int decodeFile ( char * fName ) { char buf [ BUF_SZ ] ; <vul-start> FILE * f = fopen ( fName , \"r\" ) ; <vul-end> if ( ! f ) { printf ( \"cannot open %s\\n\" , fName ) ; return DECODE_FAIL ; } else { while ( fgets ( buf , BUF_SZ , f ) ) { if ( ! checkChecksum ( buf ) ) { <vul-start> return DECODE_FAIL ; <vul-end> } else { decodeBlock ( buf ) ; } } } fclose ( f ) ; return DECODE_SUCCESS ; }",
+      "text": "CWE-772 Fixed Code Lines are: <vul-start> FILE * f = NULL ; <vul-start> ) { fclose ( f ) ;"
+    }
+  ],
+  "CWE-763": [
+    {
+      "id": "10059",
+      "title": "CWE-763 Vulnerable Code Is: CWE-763 char * * ap , * argv [ 10 ] , * inputstring ; for ( ap = argv ; ( * ap = strsep ( & inputstring , \" \\t \" ) ) != NULL ; ) if ( * * ap != ' \\0 ' ) if ( ++ ap >= & argv [ 10 ] ) break ; <vul-start> / .. . / free ( ap [ 4 ] ) ; <vul-end>",
+      "text": "CWE-763 Fixed Code Lines are: <vul-start> / free ( inputstring <vul-end> ) ;"
+    },
+    {
+      "id": "10060",
+      "title": "CWE-763 Vulnerable Code Is: CWE-763 void foo ( ) { BarObj * ptr = new BarObj ( ) ; <vul-start> free ( ptr ) ; <vul-end> }",
+      "text": "CWE-763 Fixed Code Lines are: <vul-start> ) ; delete ptr <vul-end> ; }"
+    },
+    {
+      "id": "10061",
+      "title": "CWE-763 Vulnerable Code Is: CWE-763 #define SUCCESS #define FAILURE int contains_char ( char c ) { <vul-start> char * str ; <vul-end> int i = 0 ; <vul-start> str = ( char * ) malloc ( 20 * sizeof ( char ) ) ; <vul-end> while ( str [ i ] != '\\0' ) { if ( str [ i ] == c ) { <vul-start> free ( str ) ; <vul-end> return SUCCESS ; } i = i + 1 ; } <vul-start> free ( str ) ; <vul-end> return FAILURE ; }",
+      "text": "CWE-763 Fixed Code Lines are: <vul-start> ) { const <vul-start> str = \"Search Me!\" <vul-end> ; while <vul-start> ) { <vul-end> return SUCCESS ; <vul-start> } <vul-end> return FAILURE ;"
+    },
+    {
+      "id": "10062",
+      "title": "CWE-763 Vulnerable Code Is: CWE-763 char * input = ( char * ) malloc ( 40 * sizeof ( char ) ) ; char * tok , * command ; char * sep = \" \\t\" ; get_user_input ( input ) ; tok = strtok ( input , sep ) ; while ( NULL != tok ) { <vul-start> if ( isMalformed ( tok ) ) { <vul-end> <vul-start> free ( tok ) ; <vul-end> <vul-start> } <vul-end> else { } <vul-start> tok = strtok ( NULL , sep ) ) ; <vul-end> } + free ( input ) ;",
+      "text": "CWE-763 Fixed Code Lines are: <vul-start> if ( ! <vul-start> ) { command = ( char * ) malloc ( ( strlen ( tok ) + 1 ) * sizeof ( char ) ) ; strcpy ( command , <vul-end> tok ) ; <vul-start> ) ; add_to_command_queue ( command ) ; <vul-end> } <vul-start> NULL , sep <vul-end> ) ;"
+    }
+  ],
+  "CWE-401": [
+    {
+      "id": "10022",
+      "title": "CWE-401 Vulnerable Code Is: CWE-401 char * getBlock ( int fd ) { char * buf = ( char * ) malloc ( BLOCK_SIZE ) ; if ( ! buf ) { return NULL ; } if ( read ( fd , buf , BLOCK_SIZE ) != BLOCK_SIZE ) { <vul-start> return NULL ; <vul-end> } return buf ; }",
+      "text": "CWE-401 Fixed Code Lines are: <vul-start> ) { free ( buf ) ;"
+    }
+  ],
+  "CWE-667": [
+    {
+      "id": "10066",
+      "title": "CWE-667 Vulnerable Code Is: CWE-667 <vul-start> // void f ( pthread_mutex_t * mutex ) { <vul-end> <vul-start> pthread_mutex_lock ( mutex ) ; <vul-end> <vul-start> - - - pthread_mutex_unlock ( mutex ) ; <vul-end> <vul-start> + + } <vul-end>",
+      "text": "CWE-667 Fixed Code Lines are: <vul-start> // int <vul-end> f ( pthread_mutex_t <vul-start> ) { int result ; result = <vul-start> - - - if ( 0 != result ) return result ; + + result = <vul-start> ) ; return result ; <vul-end> }"
+    }
+  ],
+  "CWE-416": [
+    {
+      "id": "10017",
+      "title": "CWE-416 Vulnerable Code Is: CWE-416 #include #include #define BUFSIZER1 512 #define BUFSIZER2 8 int main ( int argc , char * * argv ) { <vul-start> char * buf1R1 ; <vul-end> <vul-start> char * buf2R1 ; <vul-end> char * buf2R2 ; char * buf3R2 ; <vul-start> buf1R1 = ( char * ) malloc ( BUFSIZER1 ) ; <vul-end> buf2R1 = ( char * ) malloc ( BUFSIZER1 ) ; free ( buf2R1 ) ; buf2R2 = ( char * ) malloc ( BUFSIZER2 ) ; buf3R2 = ( char * ) malloc ( BUFSIZER2 ) ; if ( argc > 1 ) { strncpy ( buf2R1 , argv [ 1 ] , BUFSIZER1 - 1 ) ; } free ( buf1R1 ) ; free ( buf2R2 ) ; free ( buf3R2 ) ; }",
+      "text": "CWE-416 Fixed Code Lines are: <vul-start> char * buf1R1 = NULL <vul-start> char * buf2R1 = NULL <vul-start> ; buf1R1 <vul-end> = ( char"
+    },
+    {
+      "id": "10018",
+      "title": "CWE-416 Vulnerable Code Is: CWE-416 char * ptr = ( char * ) malloc ( SIZE ) ; int abrt = 0 ; if ( err ) { abrt = 1 ; free ( ptr ) ; } if ( abrt ) { <vul-start> logError ( \"operation aborted before commit\" , ptr ) ; <vul-end> }",
+      "text": "CWE-416 Fixed Code Lines are: <vul-start> logError ( \"operation aborted before commit\" <vul-end> ) ;"
+    }
+  ],
+  "CWE-415": [
+    {
+      "id": "10031",
+      "title": "CWE-415 Vulnerable Code Is: CWE-415 char * ptr = ( char * ) malloc ( SIZE ) ; .. . if ( abrt ) { <vul-start> free ( ptr ) ; <vul-end> } .. . if ( ptr != NULL ) { free ( ptr ) ; }",
+      "text": "CWE-415 Fixed Code Lines are: <vul-start> ) { ptr = NULL <vul-end> ; }"
+    },
+    {
+      "id": "10032",
+      "title": "CWE-415 Vulnerable Code Is: CWE-415 #include #include #define BUFSIZE1 512 #define BUFSIZE2 8 int main ( int argc , char * * argv ) { char * buf1R1 ; char * buf2R1 ; char * buf1R2 ; buf1R1 = ( char * ) malloc ( BUFSIZE2 ) ; buf2R1 = ( char * ) malloc ( BUFSIZE2 ) ; free ( buf1R1 ) ; free ( buf2R1 ) ; <vul-start> buf1R2 = ( char * ) malloc ( BUFSIZE1 ) ; <vul-end> strncpy ( buf1R2 , argv [ 1 ] , BUFSIZE1 - 1 ) ; free ( buf2R1 ) ; <vul-start> free ( buf1R2 ) ; <vul-end> }",
+      "text": "CWE-415 Fixed Code Lines are: <vul-start> ) ; buf1R1 = NULL ; <vul-start> ) ; buf2R1 = NULL ;"
+    }
+  ],
+  "CWE-601": [
+    {
+      "id": "10088",
+      "title": "CWE-601 Vulnerable Code Is: CWE-601 $ redirect_url = $ _GET [ 'url' ] ; <vul-start> header ( \" Location : \" . $ redirect_url ) ; <vul-end>",
+      "text": "CWE-601 Fixed Code Lines are: <vul-start> ] ; + $ trusted_sites = array ( ' http : ' http : ) ; + $ is_trusted = false ; foreach ( $ trusted_sites as $ site ) { if ( strpos ( $ redirect_url , $ site ) == = 0 ) { $ is_trusted = true ; break ; } } + if ( $ is_trusted ) { header ( \"Location: \" <vul-end> . $ redirect_url <vul-start> ) ; } else { header ( \"Location: http://example.com/default-page.php\" ) ; } <vul-end>"
+    }
+  ],
+  "CWE-617": [
+    {
+      "id": "10025",
+      "title": "CWE-617 Vulnerable Code Is: CWE-617 tring email = request . getParameter ( \"email_address\" ) ; <vul-start> assert email != null ; <vul-end>",
+      "text": "CWE-617 Fixed Code Lines are: <vul-start> ) ; if ( email = = null ) { email = \"\" ; } <vul-end>"
+    }
+  ],
+  "CWE-476": [
+    {
+      "id": "10005",
+      "title": "CWE-476 Vulnerable Code Is: CWE-476 void host_lookup ( char * user_supplied_addr ) { struct hostent * hp ; in_addr_t * addr ; char hostname [ 64 ] ; in_addr_t inet_addr ( const char * cp ) ; validate_addr_form ( user_supplied_addr ) ; addr = inet_addr ( user_supplied_addr ) ; hp = gethostbyaddr ( addr , sizeof ( struct in_addr ) , AF_INET ) ; <vul-start> strcpy ( hostname , hp -> h_name ) ; <vul-end> <vul-start> } <vul-end>",
+      "text": "CWE-476 Fixed Code Lines are: <vul-start> ) ; if ( hp == NULL ) { die ( \"Failed to resolve hostname: Die evil hacker!\\n\" ) ; } else { <vul-start> } }"
+    }
+  ],
+  "CWE-77": [
+    {
+      "id": "10051",
+      "title": "CWE-77 Vulnerable Code Is: CWE-77 int main ( int argc , char * * argv ) { <vul-start> char cmd [ CMD_MAX ] = \"/usr/bin/cat \" ; <vul-end> <vul-start> strcat ( cmd , argv [ 1 ] ) ; <vul-end> <vul-start> + + system ( cmd ) ; <vul-end> return 0 ; }",
+      "text": "CWE-77 Fixed Code Lines are: <vul-start> ) { if ( argc != 2 ) { printf ( \"Usage: %s <filename>\\n\" , argv [ 0 ] ) ; return 1 ; } + const char * filename = argv [ 1 ] ; + <vul-start> [ CMD_MAX ] ; snprintf <vul-end> ( cmd , <vul-start> ( cmd , CMD_MAX , \"/usr/bin/cat %s\" , filename <vul-end> ) ; <vul-start> ) ; <vul-end> system ( cmd"
+    },
+    {
+      "id": "10052",
+      "title": "CWE-77 Vulnerable Code Is: CWE-77 #include #include int main ( int argc , char * * argv ) { <vul-start> char cat [ ] = \"cat \" ; <vul-end> <vul-start> char * command ; <vul-end> size_t commandLength ; <vul-start> commandLength = strlen ( cat ) + strlen ( argv [ 1 ] ) + 1 ; <vul-end> <vul-start> command = ( char * ) malloc ( commandLength ) ; <vul-end> strncpy ( command , cat , commandLength ) ; strncat ( command , argv [ 1 ] , ( commandLength - strlen ( cat ) ) ) ; + system ( command ) ; return 0 ; }",
+      "text": "CWE-77 Fixed Code Lines are: <vul-start> ) { const char * cat <vul-end> = \"cat \" ; <vul-start> \"cat \" ; const char * filename ; if ( argc != 2 ) { printf ( \"Usage: %s <filename>\\n\" , argv [ 0 ] ) ; return 1 ; } + filename = <vul-end> argv [ 1 <vul-start> [ 1 ] ; execl ( \"/bin/cat\" , \"cat\" , filename , <vul-end> ( char * <vul-start> char * ) NULL <vul-end> ) ;"
+    }
+  ],
+  "CWE-362": [
+    {
+      "id": "10016",
+      "title": "CWE-362 Vulnerable Code Is: CWE-362 <vul-start> // void f ( pthread_mutex_t * mutex ) { <vul-end> <vul-start> + pthread_mutex_lock ( mutex ) ; <vul-end> <vul-start> pthread_mutex_unlock ( mutex ) ; <vul-end> <vul-start> + } <vul-end>",
+      "text": "CWE-362 Fixed Code Lines are: <vul-start> // int <vul-end> f ( pthread_mutex_t <vul-start> ) { int result ; + result = <vul-end> pthread_mutex_lock ( mutex <vul-start> ) ; if ( result != 0 ) { return result ; } result = <vul-start> ) ; if ( result != 0 ) { return result ; } + return 0 ; <vul-end> }"
+    }
+  ],
+  "CWE-295": [
+    {
+      "id": "10034",
+      "title": "CWE-295 Vulnerable Code Is: CWE-295 if ( ( cert = SSL_get_peer_certificate ( ssl ) ) && host ) { foo = SSL_get_verify_result ( ssl ) ; <vul-start> if ( ( X509_V_OK == foo ) || ( X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN == foo ) ) { <vul-end> } }",
+      "text": "CWE-295 Fixed Code Lines are: <vul-start> == foo ) && verifyCertificate ( cert , host <vul-end> ) ) {"
+    },
+    {
+      "id": "10035",
+      "title": "CWE-295 Vulnerable Code Is: CWE-295 if ( cert = SSL_get_peer_certificate ( ssl ) ) { foo = SSL_get_verify_result ( ssl ) ; <vul-start> if ( ( X509_V_OK == foo ) || ( X509_V_ERR_CERT_HAS_EXPIRED == foo ) ) } <vul-end>",
+      "text": "CWE-295 Fixed Code Lines are: <vul-start> if ( <vul-end> X509_V_OK == foo <vul-start> X509_V_OK == foo && ! is_certificate_expired ( cert <vul-end> ) )"
+    },
+    {
+      "id": "10036",
+      "title": "CWE-295 Vulnerable Code Is: CWE-295 if ( cert = SSL_get_peer_certificate ( ssl ) ) { <vul-start> } <vul-end>",
+      "text": "CWE-295 Fixed Code Lines are: <vul-start> ) { int verify_result = SSL_get_verify_result ( ssl ) ; if ( verify_result == X509_V_OK ) { } else { }"
+    }
+  ],
+  "CWE-835": [
+    {
+      "id": "10033",
+      "title": "CWE-835 Vulnerable Code Is: CWE-835 int processMessagesFromServer ( char * hostaddr , int port ) { .. . int servsock ; int connected ; struct sockaddr_in servaddr ; servsock = socket ( AF_INET , SOCK_STREAM , 0 ) ; memset ( & servaddr , 0 , sizeof ( servaddr ) ) ; servaddr . sin_family = AF_INET ; servaddr . sin_port = htons ( port ) ; servaddr . sin_addr . s_addr = inet_addr ( hostaddr ) ; int count = 0 ; do { <vul-start> connected = connect ( servsock , ( struct sockaddr * ) & servaddr , sizeof ( servaddr ) ) ; <vul-end> count ++ ; if ( connected > - 1 ) { .. . } } while ( connected < 0 ) ; .. . }",
+      "text": "CWE-835 Fixed Code Lines are: <vul-start> do { if ( count >= MAX_ATTEMPTS ) { break ; }"
+    }
+  ],
+  "CWE-674": [
+    {
+      "id": "10037",
+      "title": "CWE-674 Vulnerable Code Is: CWE-674 void do_something_recursive ( int flg ) { if ( flg ) { <vul-start> do_something_recursive ( flg ) ; <vul-end> } }",
+      "text": "CWE-674 Fixed Code Lines are: <vul-start> ) { flg = 0 ;"
+    }
+  ],
+  "CWE-78": [
+    {
+      "id": "10041",
+      "title": "CWE-78 Vulnerable Code Is: CWE-78 int main ( int argc , char * * argv ) { <vul-start> char cmd [ CMD_MAX ] = \"/usr/bin/cat \" ; <vul-end> system ( cmd ) ; }",
+      "text": "CWE-78 Fixed Code Lines are: <vul-start> cmd [ CMD_MAX + 12 <vul-start> ] = \"/usr/bin/cat \" ; char arg [ CMD_MAX ] ; strncpy ( arg , argv [ 1 ] , CMD_MAX - 1 ) ; arg [ CMD_MAX - 1 ] = '\\0' ; strncat ( cmd , arg , CMD_MAX - 1 )"
+    }
+  ],
+  "CWE-88": [
+    {
+      "id": "10095",
+      "title": "CWE-88 Vulnerable Code Is: CWE-88 sub do_listing { my ( $ fname ) = @_ ; if ( ! validate_name ( $ fname ) ) { print \"Error: name is not well-formed!\\n\" ; return ; } <vul-start> # build command my $ cmd = \"/bin/ls -l $fname\" ; <vul-end> system ( $ cmd ) ; } sub validate_name { my ( $ name ) = @_ ; <vul-start> if ( $ name = ~ / ^ [ \\w \\- ] + $ / ) { <vul-end> return 1 ; } else { return 0 ; } }",
+      "text": "CWE-88 Fixed Code Lines are: <vul-start> $ cmd = \"/bin/ls -l -- $fname\" <vul-end> ; system <vul-start> ~ / ^ \\w"
+    }
+  ],
+  "CWE-79": [
+    {
+      "id": "10070",
+      "title": "CWE-79 Vulnerable Code Is: CWE-79 $ username = $ _GET [ ' sername ' ; <vul-start> echo ' < div class = \"header\" > Welcome , ' . $ username . ' < / div > ' ; <vul-end>",
+      "text": "CWE-79 Fixed Code Lines are: <vul-start> , ' . htmlspecialchars ( $ username , ENT_QUOTES , ' UTF - 8 ' ) <vul-end> . ' <"
+    }
+  ],
+  "CWE-94": [
+    {
+      "id": "10092",
+      "title": "CWE-94 Vulnerable Code Is: CWE-94 $ MessageFile = \" messages . out \" ; if ( $ _GET [ \"action\" ] == \"NewMessage\" ) { $ name = $ _GET [ \"name\" ] ; $ message = $ _GET [ \"message\" ] ; <vul-start> $ handle = fopen ( $ MessageFile , \"a+\" ) ; <vul-end> fwrite ( $ handle , \"<b>\" . htmlspecialchars ( $ name ) . \"</b> says '\" . htmlspecialchars ( $ message ) . \"'<hr>\\n\" ) ; fclose ( $ handle ) ; echo \"Message Saved!<p>\\n\" ; } else if ( $ _GET [ \"action\" ] == \"ViewMessages\" ) { <vul-start> include ( $ MessageFile ) ; <vul-end> }",
+      "text": "CWE-94 Fixed Code Lines are: <vul-start> $ MessageFile , \"a\" ) or die ( \"Unable to open file\" <vul-end> ) ; <vul-start> ) { echo file_get_contents <vul-end> ( $ MessageFile"
+    }
+  ],
+  "CWE-129": [
+    {
+      "id": "10067",
+      "title": "CWE-129 Vulnerable Code Is: CWE-129 int getValueFromArray ( int * array , int len , int index ) { int value ; <vul-start> if ( index < len ) { <vul-end> value = array [ index ] ; } else { printf ( \"Value is: %d\\n\" , array [ index ] ) ; value = - 1 ; } return value ; }",
+      "text": "CWE-129 Fixed Code Lines are: <vul-start> if ( index >= 0 &&"
+    },
+    {
+      "id": "10068",
+      "title": "CWE-129 Vulnerable Code Is: CWE-129 int getsizes ( int sock , int count , int * sizes ) { .. . char buf [ BUFFER_SIZE ] ; int ok ; int num , size ; while ( ( ok = gen_recv ( sock , buf , sizeof ( buf ) ) ) == 0 ) { if ( DOTLINE ( buf ) ) break ; else if ( sscanf ( buf , \"%d %d\" , & num , & size ) == 2 ) { <vul-start> } <vul-end> } .. . }",
+      "text": "CWE-129 Fixed Code Lines are: <vul-start> ) { if ( num > 0 && num <= ( unsigned ) count ) sizes [ num - 1 ] = size ; else { report ( stderr , \"Warning: ignoring bogus data for message sizes returned by server.\\n\" ) ; }"
+    },
+    {
+      "id": "10069",
+      "title": "CWE-129 Vulnerable Code Is: CWE-129 int main ( int argc , char * * argv ) { char * items [ ] = { \"boat\" , \"car\" , \"truck\" , \"train\" } ; int offset = GetUntrustedOffset ( ) ; <vul-start> printf ( \"You selected %s\\n\" , items [ index ] ) ; <vul-end> <vul-start> } <vul-end>",
+      "text": "CWE-129 Fixed Code Lines are: <vul-start> ) ; int index = offset - 1 ; if ( index >= 0 && index < sizeof ( items ) / sizeof ( items [ 0 ] ) ) { <vul-start> } else { printf ( \"Invalid offset\\n\" ) ; } }"
+    }
+  ],
+  "CWE-290": [
+    {
+      "id": "10104",
+      "title": "CWE-290 Vulnerable Code Is: CWE-290 sd = socket ( AF_INET , SOCK_DGRAM , 0 ) ; serv . sin_family = AF_INET ; serv . sin_addr . s_addr = htonl ( INADDR_ANY ) ; serv . sin_port = htons ( 1008 ) ; bind ( sd , ( struct sockaddr * ) & serv , sizeof ( serv ) ) ; while ( 1 ) { memset ( msg , 0x0 , MAX_MSG ) ; clilen = sizeof ( cli ) ; <vul-start> if ( inet_ntoa ( cli . sin_addr ) == getTrustedAddress ( ) ) { <vul-end> n = recvfrom ( sd , msg , MAX_MSG , 0 , ( struct sockaddr * ) & cli , & clilen ) ; } }",
+      "text": "CWE-290 Fixed Code Lines are: <vul-start> if ( isAddressTrusted <vul-end> ( cli . <vul-start> cli . sin_addr <vul-end> ) ) {"
+    },
+    {
+      "id": "10105",
+      "title": "CWE-290 Vulnerable Code Is: CWE-290 struct hostent * hp ; struct in_addr myaddr ; char * tHost = \"trustme.example.com\" ; myaddr . s_addr = inet_addr ( ip_addr_string ) ; hp = gethostbyaddr ( ( char * ) & myaddr , sizeof ( struct in_addr ) , AF_INET ) ; <vul-start> if ( hp && ! strncmp ( hp -> h_name , tHost , sizeof ( tHost ) ) ) { <vul-end> trusted = true ; } else { trusted = false ; }",
+      "text": "CWE-290 Fixed Code Lines are: <vul-start> ( hp && checkHostname <vul-end> ( hp -> <vul-start> h_name , tHost ) <vul-end> ) {"
+    }
+  ],
+  "CWE-354": [
+    {
+      "id": "10065",
+      "title": "CWE-354 Vulnerable Code Is: CWE-354 ( sd = socket ( AF_INET , SOCK_DGRAM , 0 ) ; serv . sin_family = AF_INET ; serv . sin_addr . s_addr = htonl ( INADDR_ANY ) ; serv . sin_port = htons ( 1008 ) ; bind ( sd , ( struct sockaddr * ) & serv , sizeof ( serv ) ) ; while ( 1 ) { <vul-start> memset ( msg , 0x0 , MAX_MSG ) ; <vul-end> clilen = sizeof ( cli ) ; <vul-start> if ( inet_ntoa ( cli . sin_addr ) == .. . ) n = recvfrom ( sd , msg , MAX_MSG , 0 , ( struct sockaddr * ) & cli , & clilen ) ; <vul-end> <vul-start> + + + } <vul-end>",
+      "text": "CWE-354 Fixed Code Lines are: <vul-start> ) { unsigned char received_checksum ; unsigned char calculated_checksum = 0 ; <vul-start> .. . ) { <vul-start> ; + for ( int i = 0 ; i < n ; i ++ ) { calculated_checksum ^= msg [ i ] ; } + received_checksum = msg [ .. . ] ; + if ( calculated_checksum == received_checksum ) { } else { } } <vul-end> }"
+    }
+  ],
+  "CWE-494": [
+    {
+      "id": "10096",
+      "title": "CWE-494 Vulnerable Code Is: CWE-494 URL [ ] classURLs = new URL [ ] { new URL ( \"file:subdir/\" ) } <vul-start> ; <vul-end> URLClassLoader loader = new URLClassLoader ( classURLs ) ; Class < ? > loadedClass = Class . forName ( \"loadMe\" , true , loader ) ;",
+      "text": "CWE-494 Fixed Code Lines are: <vul-start> } ; MessageDigest md = MessageDigest . getInstance ( \"SHA-256\" ) ; try ( InputStream is = new URL ( \"file:subdir/loadMe.class\" ) . openStream ( ) ) { byte [ ] buffer = new byte [ 8192 ] ; int bytesRead ; while ( ( bytesRead = is . read ( buffer ) ) != - 1 ) { md . update ( buffer , 0 , bytesRead ) ; } } byte [ ] checksum = md . digest ( ) ; String expectedChecksum = \"YOUR_EXPECTED_CHECKSUM\" ; if ( ! verifyChecksum ( expectedChecksum , checksum ) ) { throw new SecurityException ( \"Integrity check failed for loaded class\" ) ; }"
+    }
+  ],
+  "CWE-908": [
+    {
+      "id": "10045",
+      "title": "CWE-908 Vulnerable Code Is: CWE-908 <vul-start> // char str [ 20 ] ; <vul-end> strcat ( str , \" hello world \" ) ; printf ( \" % s \" , str ) ;",
+      "text": "CWE-908 Fixed Code Lines are: <vul-start> [ 20 ] ; strcpy ( str , \"\" )"
+    },
+    {
+      "id": "10046",
+      "title": "CWE-908 Vulnerable Code Is: CWE-908 <vul-start> // char str [ 20 ] ; <vul-end> strcat ( str , \" hello world \" ) ; printf ( \" % s \" , str ) ;",
+      "text": "CWE-908 Fixed Code Lines are: <vul-start> [ 20 ] ; memset ( str , 0 , sizeof ( str ) )"
+    }
+  ],
+  "CWE-665": [
+    {
+      "id": "10064",
+      "title": "CWE-665 Vulnerable Code Is: CWE-665 char str [ 20 ] ; <vul-start> strcat ( str , \" hello world \" ) ; <vul-end> <vul-start> printf ( \" % s \" , str ) ; <vul-end>",
+      "text": "CWE-665 Fixed Code Lines are: <vul-start> ] ; str [ 0 ] = '\\0' ; <vul-start> ( str , \"hello world\" <vul-end> ) ; <vul-start> printf ( \"%s\" <vul-end> , str )"
+    }
+  ],
+  "CWE-681": [
+    {
+      "id": "10098",
+      "title": "CWE-681 Vulnerable Code Is: CWE-681 unsigned int readdata ( ) { int amount = 0 ; if ( result == ERROR ) amount = - 1 ; <vul-start> return amount ; <vul-end> }",
+      "text": "CWE-681 Fixed Code Lines are: <vul-start> 1 ; if ( amount < 0 ) { } return static_cast < unsigned int > ( amount ) <vul-end> ; }"
+    },
+    {
+      "id": "10099",
+      "title": "CWE-681 Vulnerable Code Is: CWE-681 unsigned int readdata ( ) { int amount = 0 ; amount = accessmainframe ( ) ; <vul-start> return amount ; <vul-end> }",
+      "text": "CWE-681 Fixed Code Lines are: <vul-start> ) ; if ( amount < 0 ) { } return static_cast < unsigned int > ( amount ) <vul-end> ; }"
+    }
+  ],
+  "CWE-89": [
+    {
+      "id": "10071",
+      "title": "CWE-89 Vulnerable Code Is: CWE-89 .. . string userName = ctx . getAuthenticatedUserName ( ) ; <vul-start> string query = \"SELECT * FROM items WHERE owner = '\" + userName + \"' AND itemname = '\" + ItemName . Text + \"'\" ; <vul-end> <vul-start> SqlCommand command = new SqlCommand ( query , conn ) ; <vul-end> sda = new SqlDataAdapter ( command ) ; DataTable dt = new DataTable ( ) ; sda . Fill ( dt ) ;",
+      "text": "CWE-89 Fixed Code Lines are: <vul-start> string query = \"SELECT * FROM items WHERE owner = @userName AND itemname = @itemName\" <vul-end> ; SqlCommand <vul-start> query , conn ) ; command . Parameters . AddWithValue ( \" @userName \" , userName ) ; command . Parameters . AddWithValue ( \" @itemName \" , ItemName . Text"
+    }
+  ],
+  "CWE-90": [
+    {
+      "id": "10091",
+      "title": "CWE-90 Vulnerable Code Is: CWE-90 context = new InitialDirContext ( env ) ; <vul-start> String searchFilter = \"StreetAddress=\" + address ; <vul-end> NamingEnumeration answer = context . search ( searchBase , searchFilter , searchCtls ) ;",
+      "text": "CWE-90 Fixed Code Lines are: <vul-start> String searchFilter = \"(&(objectClass=*)(StreetAddress=\" + escapeLDAPFilter ( address ) + \"))\" <vul-end> ; NamingEnumeration"
+    }
+  ],
+  "CWE-252": [
+    {
+      "id": "10054",
+      "title": "CWE-252 Vulnerable Code Is: CWE-252 char buf [ 10 ] , cp_buf [ 10 ] ; <vul-start> fgets ( buf , 10 , stdin ) ; <vul-end> <vul-start> strcpy ( cp_buf , buf ) ; <vul-end>",
+      "text": "CWE-252 Fixed Code Lines are: <vul-start> ] ; if ( <vul-start> , stdin ) == NULL ) { } strncpy <vul-end> ( cp_buf , <vul-start> cp_buf , buf , sizeof ( cp_buf ) - 1 <vul-start> ) ; cp_buf [ sizeof ( cp_buf ) - 1 ] = '\\0' ;"
+    },
+    {
+      "id": "10055",
+      "title": "CWE-252 Vulnerable Code Is: CWE-252 int returnChunkSize ( void * ) { .. . } int main ( ) { <vul-start> .. . memcpy ( destBuf , srcBuf , ( returnChunkSize ( destBuf ) - 1 ) ) ; <vul-end> .. . }",
+      "text": "CWE-252 Fixed Code Lines are: <vul-start> .. . int chunkSize = returnChunkSize ( destBuf ) ; if ( chunkSize > 0 ) { size_t sizeToCopy = ( chunkSize > 1 ) ? ( chunkSize - 1 ) : 0 ; <vul-start> , srcBuf , sizeToCopy ) ; } else { } <vul-end> .. ."
+    },
+    {
+      "id": "10056",
+      "title": "CWE-252 Vulnerable Code Is: CWE-252 buf = ( char * ) malloc ( req_size ) ; <vul-start> strncpy ( buf , xfer , req_size ) ; <vul-end>",
+      "text": "CWE-252 Fixed Code Lines are: <vul-start> ) ; if ( buf != NULL ) { <vul-start> ) ; } else { }"
+    },
+    {
+      "id": "10057",
+      "title": "CWE-252 Vulnerable Code Is: CWE-252 void host_lookup ( char * user_supplied_addr ) { struct hostent * hp ; in_addr_t * addr ; char hostname [ 64 ] ; in_addr_t inet_addr ( const char * cp ) ; validate_addr_form ( user_supplied_addr ) ; addr = inet_addr ( user_supplied_addr ) ; <vul-start> hp = gethostbyaddr ( addr , sizeof ( struct in_addr ) , AF_INET ) ; <vul-end> <vul-start> strcpy ( hostname , hp -> h_name ) ; <vul-end> <vul-start> } <vul-end>",
+      "text": "CWE-252 Fixed Code Lines are: <vul-start> ) ; if ( addr != NULL ) { <vul-start> ) ; if ( hp != NULL ) { strncpy <vul-end> ( hostname , <vul-start> hp -> h_name , sizeof ( hostname ) - 1 ) ; hostname [ sizeof ( hostname ) - 1 ] = '\\0' <vul-end> ; } <vul-start> } else { } } else { } }"
+    },
+    {
+      "id": "10058",
+      "title": "CWE-252 Vulnerable Code Is: CWE-252 - int f ( pthread_mutex_t * mutex ) { <vul-start> + int f ( pthread_mutex_t * mutex ) { <vul-end> + pthread_mutex_lock ( mutex ) ; <vul-start> pthread_mutex_unlock ( mutex ) ; <vul-end> <vul-start> + } <vul-end>",
+      "text": "CWE-252 Fixed Code Lines are: <vul-start> * mutex ) { int result ; + result = <vul-end> pthread_mutex_lock ( mutex <vul-start> ) ; if ( result != 0 ) { return result ; } result = <vul-start> ) ; if ( result != 0 ) { } + return result ; } <vul-end>"
+    }
+  ],
+  "CWE-754": [
+    {
+      "id": "10081",
+      "title": "CWE-754 Vulnerable Code Is: CWE-754 #include #include int main ( void ) { char buf [ 10 ] , cp_buf [ 10 ] ; fgets ( buf , 10 , stdin ) ; <vul-start> strcpy ( cp_buf , buf ) ; <vul-end> return 0 ; }",
+      "text": "CWE-754 Fixed Code Lines are: <vul-start> ) ; size_t buf_len = strlen ( buf ) ; if ( buf_len > 0 && buf [ buf_len - 1 ] == '\\n' ) { buf [ buf_len - 1 ] = '\\0' ; } else { } strncpy <vul-end> ( cp_buf , <vul-start> cp_buf , buf , sizeof ( cp_buf ) - 1 ) ; cp_buf [ sizeof ( cp_buf ) - 1 ] = '\\0' <vul-end> ; return"
+    },
+    {
+      "id": "10082",
+      "title": "CWE-754 Vulnerable Code Is: CWE-754 #include #include #include int main ( void ) { <vul-start> char * buf ; <vul-end> <vul-start> size_t req_size = ; <vul-end> buf = ( char * ) malloc ( req_size ) ; <vul-start> strncpy ( buf , xfer , req_size ) ; <vul-end> <vul-start> return 0 ; <vul-end> }",
+      "text": "CWE-754 Fixed Code Lines are: <vul-start> char * buf = NULL <vul-start> req_size = ; if ( req_size > 0 ) { <vul-start> ) ; if ( buf != NULL ) { <vul-start> ) ; } else { fprintf ( stderr , \"Failed to allocate memory\\n\" ) ; exit ( EXIT_FAILURE ) ; } }"
+    },
+    {
+      "id": "10083",
+      "title": "CWE-754 Vulnerable Code Is: CWE-754 #include #include #include #include #include void host_lookup ( char * user_supplied_addr ) { struct hostent * hp ; in_addr_t * addr ; char hostname [ 64 ] ; validate_addr_form ( user_supplied_addr ) ; addr = inet_addr ( user_supplied_addr ) ; hp = gethostbyaddr ( addr , sizeof ( struct in_addr ) , AF_INET ) ; <vul-start> strcpy ( hostname , hp -> h_name ) ; <vul-end> } int main ( void ) { char user_input [ 16 ] ; printf ( \"Enter an IP address: \" ) ; fgets ( user_input , sizeof ( user_input ) , stdin ) ;",
+      "text": "CWE-754 Fixed Code Lines are: <vul-start> ) ; if ( hp != NULL ) { strncpy <vul-end> ( hostname , <vul-start> hp -> h_name , sizeof ( hostname ) - 1 ) ; hostname [ sizeof ( hostname ) - 1 ] = '\\0' ; } else { fprintf ( stderr , \"Failed to resolve hostname\\n\" ) ; exit ( EXIT_FAILURE ) ; } <vul-end> }"
+    },
+    {
+      "id": "10084",
+      "title": "CWE-754 Vulnerable Code Is: CWE-754 #include int outputStringToFile ( char * output , char * filename ) { <vul-start> openFileToWrite ( filename ) ; <vul-end> <vul-start> writeToFile ( output ) ; <vul-end> <vul-start> closeFile ( filename ) ; <vul-end> <vul-start> } <vul-end>",
+      "text": "CWE-754 Fixed Code Lines are: <vul-start> ) { int isOutput = SUCCESS ; int isOpen = <vul-start> ) ; if ( isOpen == FAIL ) { printf ( \"Unable to open file %s\" , filename ) ; isOutput = FAIL ; } else { int isWrite = <vul-start> ) ; if ( isWrite == FAIL ) { printf ( \"Unable to write to file %s\" , filename ) ; isOutput = FAIL ; } int isClose = <vul-start> ) ; if ( isClose == FAIL ) { isOutput = FAIL ; } } return isOutput ;"
+    }
+  ],
+  "CWE-273": [
+    {
+      "id": "10086",
+      "title": "CWE-273 Vulnerable Code Is: CWE-273 bool DoSecureStuff ( HANDLE hPipe ) { bool fDataWritten = false ; <vul-start> ImpersonateNamedPipeClient ( hPipe ) ; <vul-end> <vul-start> } <vul-end>",
+      "text": "CWE-273 Fixed Code Lines are: <vul-start> false ; if ( <vul-start> ImpersonateNamedPipeClient ( hPipe ) ) { HANDLE hFile = CreateFile ( .. . ) ; RevertToSelf ( <vul-start> } }"
+    }
+  ],
+  "CWE-434": [
+    {
+      "id": "10110",
+      "title": "CWE-434 Vulnerable Code Is: CWE-434 <vul-start> // $ target = \" pictures / \" . basename ( $ _FILES [ ' ploadedfile ' [ ' ame ' ) ; <vul-end> <vul-start> if ( move_uploaded_file ( $ _FILES [ ' ploadedfile ' [ ' mp_name ' , $ target ) ) { <vul-end> echo \"The picture has been successfully uploaded.\" ; } else { echo \"There was an error uploading the picture, please try again.\" ; }",
+      "text": "CWE-434 Fixed Code Lines are: <vul-start> \" pictures / \" . uniqid ( ) . \" _ <vul-start> ) ; $ allowedExtensions = array ( 'jpg' , ' peg ', ' png ' ; $ fileExtension = strtolower ( pathinfo ( $ _FILES [ ' ploadedfile ' [ ' ame '] , PATHINFO_EXTENSION ) ) ; if ( in_array ( $ fileExtension , $ allowedExtensions ) && <vul-end> move_uploaded_file ( $"
+    }
+  ],
+  "CWE-426": [
+    {
+      "id": "10087",
+      "title": "CWE-426 Vulnerable Code Is: CWE-426 #define DIR \"/restricted/directory\" #define PATH \"/bin:/usr/bin\" char cmd [ 500 ] ; sprintf ( cmd , \" ls - l % 480 s \" , DIR ) ; RaisePrivileges ( .. . ) ; <vul-start> system ( cmd ) ; <vul-end> DropPrivileges ( .. . ) ;",
+      "text": "CWE-426 Fixed Code Lines are: <vul-start> ) ; char trustedPath [ 100 ] ; sprintf ( trustedPath , \" PATH = % s \" putenv ( trustedPath ) ;"
+    }
+  ],
+  "CWE-502": [
+    {
+      "id": "10109",
+      "title": "CWE-502 Vulnerable Code Is: CWE-502 try { File file = new File ( \"object.obj\" ) ; ObjectInputStream in = new ObjectInputStream ( new FileInputStream ( file ) ) ; <vul-start> javax . swing . JButton button = ( javax . swing . JButton ) in . readObject ( ) ; <vul-end> in . close ( ) ; }",
+      "text": "CWE-502 Fixed Code Lines are: <vul-start> ) ; <vul-end> in . readObject"
+    }
+  ],
+  "CWE-672": [
+    {
+      "id": "10106",
+      "title": "CWE-672 Vulnerable Code Is: CWE-672 char * ptr = ( char * ) malloc ( SIZE ) ; if ( err ) { abrt = 1 ; free ( ptr ) ; } .. . if ( abrt ) { <vul-start> logError ( \"operation aborted before commit\" , ptr ) ; <vul-end> }",
+      "text": "CWE-672 Fixed Code Lines are: <vul-start> ( \"operation aborted before commit\" , NULL <vul-end> ) ;"
+    },
+    {
+      "id": "10107",
+      "title": "CWE-672 Vulnerable Code Is: CWE-672 char * ptr = ( char * ) malloc ( SIZE ) ; .. . if ( abrt ) { <vul-start> free ( ptr ) ; <vul-end> } .. . if ( ptr != NULL ) { <vul-start> } <vul-end>",
+      "text": "CWE-672 Fixed Code Lines are: <vul-start> ) { ptr = NULL <vul-end> ; } <vul-start> ) { free ( ptr ) ;"
+    },
+    {
+      "id": "10108",
+      "title": "CWE-672 Vulnerable Code Is: CWE-672 int processMessage ( char * * message ) { int result = SUCCESS ; int length = getMessageLength ( message [ 0 ] ) ; char * messageBody ; if ( ( length > 0 ) && ( length < MAX_MESSAGE_SIZE ) ) { messageBody = ( char * ) malloc ( length * sizeof ( char ) ) ; messageBody = & message [ 1 ] [ 0 ] ; int success = processMessageBody ( messageBody ) ; if ( success == ERROR ) { result = ERROR ; <vul-start> free ( messageBody ) ; <vul-end> } if ( result == ERROR ) { logError ( \"Error processing message\" , messageBody ) ; <vul-start> } <vul-end> } else { printf ( \"Unable to process message; invalid message length\" ) ; result = FAIL ; } return result ; }",
+      "text": "CWE-672 Fixed Code Lines are: <vul-start> ERROR ; <vul-end> } if <vul-start> ; } free ( messageBody ) ;"
+    }
+  ],
+  "CWE-532": [
+    {
+      "id": "10093",
+      "title": "CWE-532 Vulnerable Code Is: CWE-532 <vul-start> // Log . e ( \" ExampleActivity \" , \" Caught exception : \" + e + \" While on User : \" + User . toString ( ) ) ; <vul-end>",
+      "text": "CWE-532 Fixed Code Lines are: <vul-start> + User . getId <vul-end> ( ) )"
+    },
+    {
+      "id": "11414",
+      "title": "CWE-532 Vulnerable Code Is: CWE-532 <vul-start> logger . info ( \"Username: \" + username + \", CCN: \" + ccn ) ; <vul-end>",
+      "text": "CWE-532 Fixed Code Lines are: <vul-start> info ( \"User logged in: <vul-end> \" + username <vul-start> \" + username <vul-end> ) ; "
+    }
+
+  ],
+  "CWE-319": [
+    {
+      "id": "11415",
+      "title": "CWE-319 Vulnerable Code Is: CWE-319 <vul-start> URL u = new URL ( \"http://www.secret.example.org/\" ) ; <vul-end> HttpURLConnection hu = ( HttpURLConnection ) u . openConnection ( ) ; <vul-start> hu . setRequestMethod ( \"PUT\" ) ; hu . connect ( ) ; <vul-end> OutputStream os = hu . getOutputStream ( ) ; ",
+      "text": "CWE-319 Fixed Code Lines are: <vul-start> URL ( \"https <vul-end> : // <vul-start> ) ; hu . setRequestProperty ( \"Connection\" , \"close\" ) ; hu "
+    }
+  ],
+  "CWE-327": [
+    {
+      "id": "11416",
+      "title": "CWE-327 Vulnerable Code Is: CWE-327 <vul-start> EVP_des_ecb ( ) ; <vul-end>",
+      "text": "CWE-327 Fixed Code Lines are: <vul-start> EVP_aes_256_cbc <vul-end> ( ) ;"
+    }
+  ],
+  "cWE-347": [
+    {
+      "id": "11417",
+      "title": "CWE-347 Vulnerable Code Is: CWE-347 File f = new File ( downloadedFilePath ) ; <vul-start> JarFile jf = new JarFile ( f ) ; <vul-end>",
+      "text": "CWE-347 Fixed Code Lines are: <vul-start> JarFile ( f , true <vul-end> ) ;"
+    }
+  ]
+}
