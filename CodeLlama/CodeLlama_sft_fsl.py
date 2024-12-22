@@ -54,7 +54,7 @@ def main():
     user_prompt_list = test_df['user_prompt']
     input_pairs = list(zip(sys_prompt_list, user_prompt_list))
 
-    base_model = "../CodeLlama-7b-Instruct-hf"   # Change model here
+    base_model = "./CodeLlama-7b-Instruct-hf"   # Change model here
     model = AutoModelForCausalLM.from_pretrained(
         base_model,
         load_in_8bit=True,
@@ -81,7 +81,7 @@ def main():
 
     results_dict = {'outputs': pred_msg_list}
     results_df = pd.DataFrame.from_dict(results_dict)
-    results_df.to_csv(f'./codellama_7b_ft_fsp.csv', index=False)
+    results_df.to_csv(f'./dataset/codellama_ft_fsp.csv', index=False)
 
 if __name__ == "__main__":
     main()

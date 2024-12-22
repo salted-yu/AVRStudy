@@ -46,7 +46,7 @@ def main():
     # load customized dataset
     train_dataset = load_dataset('json', data_files='dataset/train_data_codellama_sft.jsonl', split="train")
     # eval_dataset = load_dataset('json', data_files='', split="train")
-    base_model = '../CodeLlama-7b-Instruct-hf'
+    base_model = './CodeLlama-7b-Instruct-hf'
     model = AutoModelForCausalLM.from_pretrained(
         base_model,
         load_in_8bit=True,

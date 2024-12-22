@@ -62,7 +62,7 @@ def main():
     # print(set(langs))
 
     # base_model = "codellama/CodeLlama-7b-Instruct-hf"
-    base_model = '../CodeLlama-7b-Instruct-hf'
+    base_model = './CodeLlama-7b-Instruct-hf'
     model = AutoModelForCausalLM.from_pretrained(
         base_model,
         load_in_8bit=True,
@@ -95,7 +95,7 @@ def main():
 
     results_dict = {'outputs': pred_msg_list}
     results_df = pd.DataFrame.from_dict(results_dict)
-    results_df.to_csv(f'./codellama_7b_ft_zsp.csv', index=False)
+    results_df.to_csv(f'./dataset/codellama_7b_ft_zsp.csv', index=False)
 
 if __name__ == "__main__":
     main()
